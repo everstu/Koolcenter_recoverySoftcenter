@@ -76,6 +76,8 @@ recoverySoftcenter(){
 	echo "ℹ️  恢复软件中心版本号"
 	cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
 	cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
+	# 写入版本号dbus值
+	dbus set softcenter_version=$(cat /koolshare/.soft_ver)
 	echo "ℹ️  恢复软件中心二进制"
 	cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/  >/dev/null 2>&1
 	echo "ℹ️  恢复软件中心资源"
