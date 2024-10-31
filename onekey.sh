@@ -72,12 +72,28 @@ done" > $mount_point
 }
 
 recoverySoftcenter(){
-	echo "ℹ️ 恢复软件中心安装脚本"
 	# 恢复文件
-	cp -rf /rom/etc/koolshare/scripts/* /koolshare/scripts/
+	echo "ℹ️ 恢复软件中心版本号"
+	cp -rf /rom/etc/koolshare/.soft_ver /koolshare/
+	cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/
+	echo "ℹ️ 恢复软件中心二进制"
+	cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/
+	echo "ℹ️ 恢复软件中心资源"
+	cp -rf /rom/etc/koolshare/res/* /koolshare/res/
+	cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/
+	echo "ℹ️ 恢复软件中心脚本"
+	cp -rf /koolshare/scripts/* /koolshare/scripts/
+	cp -rf /koolshare/perp/* /koolshare/perp/
+	
 	# 文件赋权
 	chmod +x /koolshare/scripts/*
-	echo "✅ 软件中心安装脚本恢复成功"
+	chmod +x /koolshare/perp/perp.sh
+	# 重启软件中心
+	if [ -f /koolshare/perp/perp.sh ];then
+		echo "ℹ️ 重启软件中心"
+		sh /koolshare/perp/perp.sh
+	fi
+	echo "✅ 软件中心恢复成功"
 }
 
 somecheck
@@ -85,3 +101,5 @@ changeAsd
 recoverySoftcenter
 
 echo "🆗 enjoy ~"
+#空一行，看结果
+echo ""
