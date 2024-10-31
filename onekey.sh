@@ -27,8 +27,8 @@ changeAsd(){
 		# 检查是否已fuck
 		checkFuck=$(ps |grep asd |grep /bin/sh)
 		if [ -n "$checkFuck" ];then
-		echo "✅️已处理 asd 无需再次处理！"
-		return
+			echo "✅️已处理 $file 无需再次处理！"
+			return
 		fi
 
 		#生成挂载文件
