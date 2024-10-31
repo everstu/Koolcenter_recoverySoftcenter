@@ -81,7 +81,7 @@ recoverySoftcenter(){
 }
 
 somecheck
-fuckAsd
+changeAsd
 recoverySoftcenter
 
 echo "🆗 enjoy ~"
