@@ -74,17 +74,17 @@ done" > $mount_point
 recoverySoftcenter(){
 	# 恢复文件
 	echo "ℹ️ 恢复软件中心版本号"
-	cp -rf /rom/etc/koolshare/.soft_ver /koolshare/
-	cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/
+	cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
+	cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
 	echo "ℹ️ 恢复软件中心二进制"
-	cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/
+	cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/  >/dev/null 2>&1
 	echo "ℹ️ 恢复软件中心资源"
-	cp -rf /rom/etc/koolshare/res/* /koolshare/res/
-	cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/
+	cp -rf /rom/etc/koolshare/res/* /koolshare/res/  >/dev/null 2>&1
+	cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/  >/dev/null 2>&1
 	echo "ℹ️ 恢复软件中心脚本"
-	cp -rf /koolshare/scripts/* /koolshare/scripts/
-	cp -rf /koolshare/perp/* /koolshare/perp/
-	
+	cp -rf /koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
+	cp -rf /koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
+
 	# 文件赋权
 	chmod +x /koolshare/scripts/*
 	chmod +x /koolshare/perp/perp.sh
