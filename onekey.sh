@@ -82,8 +82,8 @@ recoverySoftcenter(){
 	cp -rf /rom/etc/koolshare/res/* /koolshare/res/  >/dev/null 2>&1
 	cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/  >/dev/null 2>&1
 	echo "ℹ️ 恢复软件中心脚本"
-	cp -rf /koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
-	cp -rf /koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
+	cp -rf /rom/etc/koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
+	cp -rf /rom/etc/koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
 
 	# 文件赋权
 	chmod +x /koolshare/scripts/*
