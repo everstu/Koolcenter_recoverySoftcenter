@@ -11,11 +11,11 @@ somecheck(){
 		echo "🔴 固件脚本目录不存在，无法修复"
 		exit
 	fi
-	if [ -n $(which dbus) ]; then
+	if [ ! -f /usr/bin/dbus ]; then
 		echo "🔴 未找到dbus命令，无法修复"
 		exit
 	fi
-	if [ -n $(cat /rom/etc/koolshare/.soft_ver) ];then
+	if [ ! -f /rom/etc/koolshare/.soft_ver ];then
 		echo "🔴 未找到固件版本号，无法修复"
 		exit
 	fi
@@ -91,7 +91,7 @@ recoverySoftcenter(){
 		cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
 		cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
 		# 写入版本号dbus值
-		dbus set softcenter_version=$(cat /koolshare/.soft_ver)
+		/usr/bin/dbus set softcenter_version=$(cat /koolshare/.soft_ver)
 		echo "ℹ️  恢复软件中心二进制"
 		cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/  >/dev/null 2>&1
 		echo "ℹ️  恢复软件中心资源"
