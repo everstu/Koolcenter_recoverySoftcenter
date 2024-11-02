@@ -85,7 +85,7 @@ done" > $mount_point
 
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
-	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ];then
+	# if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ];then
 		# 恢复文件
 		echo "ℹ️  恢复软件中心版本号"
 		cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
@@ -109,9 +109,9 @@ recoverySoftcenter(){
 			echo "ℹ️  重启软件中心"
 			sh /koolshare/perp/perp.sh
 		fi
-	else
-		echo "ℹ️  软件中心无需恢复"
-	fi
+	# else
+		# echo "ℹ️  软件中心无需恢复"
+	# fi
 	echo "✅️ Step 2 Done!"
 	echo ""
 }
