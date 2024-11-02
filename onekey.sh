@@ -85,18 +85,31 @@ done" > $mount_point
 
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
-	# if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ];then
-		# 恢复文件
+	# 判断安装脚本是否存在或者小于
+	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ] || [ $(wc -c /koolshare/scripts/ks_app_install.sh) -lt 100 ] || [ $(wc -c /koolshare/scripts/ks_tar_install.sh) -lt 100 ];then
 		echo "ℹ️  恢复软件中心版本号"
 		cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
 		cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
 		# 写入版本号dbus值
 		/usr/bin/dbus set softcenter_version=$(cat /koolshare/.soft_ver)
+
 		echo "ℹ️  恢复软件中心二进制"
-		cp -rf /rom/etc/koolshare/bin/* /koolshare/bin/  >/dev/null 2>&1
+		# 恢复二进制 改成创建软连接节省空间
+		local _BINS=$(find /rom/etc/koolshare/bin/* | awk -F "/" '{print $NF}' | sed '/^$/d')
+		for _BIN in ${_BINS}
+		do
+			if [ -f "/rom/etc/koolshare/bin/${_BIN}" ];then
+				# 安装二进制软连接
+				rm -rf /koolshare/bin/${_BIN}
+				ln -sf /rom/etc/koolshare/bin/${_BIN} /koolshare/bin/${_BIN}
+			fi
+		done
+		sync
+
 		echo "ℹ️  恢复软件中心资源"
 		cp -rf /rom/etc/koolshare/res/* /koolshare/res/  >/dev/null 2>&1
 		cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/  >/dev/null 2>&1
+
 		echo "ℹ️  恢复软件中心脚本"
 		cp -rf /rom/etc/koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
 		cp -rf /rom/etc/koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
@@ -107,11 +120,12 @@ recoverySoftcenter(){
 		# 重启软件中心
 		if [ -f /koolshare/perp/perp.sh ];then
 			echo "ℹ️  重启软件中心"
-			sh /koolshare/perp/perp.sh
+			sh /koolshare/perp/perp.sh >/dev/null 2>&1
 		fi
-	# else
-		# echo "ℹ️  软件中心无需恢复"
-	# fi
+	else
+		echo "ℹ️  软件中心无需恢复"
+	fi
+
 	echo "✅️ Step 2 Done!"
 	echo ""
 }
