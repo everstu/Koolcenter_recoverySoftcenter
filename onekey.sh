@@ -86,7 +86,7 @@ done" > $mount_point
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
 	# 判断安装脚本是否存在或者小于
-	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ] || [ $(wc -c /koolshare/scripts/ks_app_install.sh) -lt 100 ] || [ $(wc -c /koolshare/scripts/ks_tar_install.sh) -lt 100 ];then
+	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ] || [ $(wc -c < /koolshare/scripts/ks_app_install.sh) -lt 100 ] || [ $(wc -c < /koolshare/scripts/ks_tar_install.sh) -lt 100 ];then
 		echo "ℹ️  恢复软件中心版本号"
 		cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
 		cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
