@@ -121,25 +121,46 @@ doRecovery(){
   fi
 }
 
+checkFilesMd5(){
+  # 定义两个目录
+  local baseFilePath="/rom/etc/koolshare/scripts/"
+  local koolcenterPath="/koolshare/scripts/"
+
+  # 遍历第一个目录下的文件
+  for file1 in $baseFilePath*; do
+      # 获取文件名
+      filename=$(basename $file1)
+      # 构造第二个目录下的文件路径
+      file2="$koolcenterPath$filename"
+      # 检查文件是否存在于第二个目录
+      if [ -e $file2 ]; then
+          # 计算文件 1 的 MD5
+          md5_1=$(md5sum $file1 | awk '{print $1}')
+          # 计算文件 2 的 MD5
+          md5_2=$(md5sum $file2 | awk '{print $1}')
+          # 比较 MD5 值
+          if [ "$md5_1" == "$md5_2" ]; then
+              echo "$filename: not change"
+          else
+              echo "$filename: is changed"
+              exit 1
+          fi
+      else
+          echo "$filename: not found in $dir2"
+          exit 1
+      fi
+  done
+  echo 0
+}
+
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
 	# 判断安装脚本是否存在或者小于
-	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ] || [ $(wc -c < /koolshare/scripts/ks_app_install.sh) -lt 100 ] || [ $(wc -c < /koolshare/scripts/ks_tar_install.sh) -lt 100 ];then
-    doRecovery
-	else
-	  local md5sum1=$(md5sum /rom/etc/koolshare/scripts/ks_app_install.sh | awk '{print $1}')
-	  local md5sum2=$(md5sum /koolshare/scripts/ks_app_install.sh | awk '{print $1}')
-	  local md5sum3=$(md5sum /rom/etc/koolshare/scripts/ks_tar_install.sh | awk '{print $1}')
-	  local md5sum4=$(md5sum /koolshare/scripts/ks_tar_install.sh | awk '{print $1}')
-	  echo "ℹ️  固件自带文件: $md5sum1 | $md5sum3"
-	  echo "ℹ️  软件中心文件: $md5sum2 | $md5sum4"
-	  if [ "$md5sum1" != "$md5sum2" ] || [ "$md5sum3" != "$md5sum4" ];then
-	    echo "ℹ️  脚本不一致，开始恢复"
+  if[ $(checkFilesMd5) ];then
       doRecovery
     else
-		  echo "ℹ️  软件中心无需恢复"
-		fi
-	fi
+      echo "ℹ️  软件中心无需恢复"
+  fi
 
 	echo "✅️ Step 2 Done!"
 	echo ""
