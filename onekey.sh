@@ -125,7 +125,6 @@ checkFilesMd5(){
   # 定义两个目录
   local baseFilePath="/rom/etc/koolshare/scripts/"
   local koolcenterPath="/koolshare/scripts/"
-
   # 遍历第一个目录下的文件
   for file1 in $baseFilePath*; do
     # 获取文件名
@@ -139,24 +138,20 @@ checkFilesMd5(){
       # 计算文件 2 的 MD5
       md5_2=$(md5sum $file2 | awk '{print $1}')
       # 比较 MD5 值
-      if [ "$md5_1" == "$md5_2" ]; then
-          echo "$filename: not change"
-      else
-          echo "$filename: is changed"
+      if [ "$md5_1" != "$md5_2" ]; then
           exit 1
       fi
     else
-      echo "$filename: not found in $dir2"
       exit 1
     fi
   done
-  echo 0
 }
 
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
 	# 判断安装脚本是否存在或者小于
-  if [ "$(checkFilesMd5)" ]; then
+	local check_result=$(checkFilesMd5)
+  if [ "$check_result" == "1" ]; then
     doRecovery
   else
     echo "ℹ️  软件中心无需恢复"
