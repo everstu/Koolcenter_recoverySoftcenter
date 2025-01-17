@@ -83,47 +83,62 @@ done" > $mount_point
 	echo ""
 }
 
+doRecovery(){
+  echo "ℹ️  恢复软件中心版本号"
+  cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
+  cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
+  # 写入版本号dbus值
+  /usr/bin/dbus set softcenter_version=$(cat /koolshare/.soft_ver)
+
+  echo "ℹ️  恢复软件中心二进制"
+  # 恢复二进制 改成创建软连接节省空间
+  local _BINS=$(find /rom/etc/koolshare/bin/* | awk -F "/" '{print $NF}' | sed '/^$/d')
+  for _BIN in ${_BINS}
+  do
+    if [ -f "/rom/etc/koolshare/bin/${_BIN}" ];then
+      # 安装二进制软连接
+      rm -rf /koolshare/bin/${_BIN}
+      ln -sf /rom/etc/koolshare/bin/${_BIN} /koolshare/bin/${_BIN}
+    fi
+  done
+  sync
+
+  echo "ℹ️  恢复软件中心资源"
+  cp -rf /rom/etc/koolshare/res/* /koolshare/res/  >/dev/null 2>&1
+  cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/  >/dev/null 2>&1
+
+  echo "ℹ️  恢复软件中心脚本"
+  cp -rf /rom/etc/koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
+  cp -rf /rom/etc/koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
+
+  # 文件赋权
+  chmod +x /koolshare/scripts/*  >/dev/null 2>&1
+  chmod +x /koolshare/perp/perp.sh  >/dev/null 2>&1
+  # 重启软件中心
+  if [ -f /koolshare/perp/perp.sh ];then
+    echo "ℹ️  重启软件中心"
+    sh /koolshare/perp/perp.sh >/dev/null 2>&1
+  fi
+}
+
 recoverySoftcenter(){
 	echo "😛 Step 2: 恢复软件中心 "
 	# 判断安装脚本是否存在或者小于
 	if [ ! -f /koolshare/scripts/ks_app_install.sh ] || [ ! -f /koolshare/scripts/ks_tar_install.sh ] || [ $(wc -c < /koolshare/scripts/ks_app_install.sh) -lt 100 ] || [ $(wc -c < /koolshare/scripts/ks_tar_install.sh) -lt 100 ];then
-		echo "ℹ️  恢复软件中心版本号"
-		cp -rf /rom/etc/koolshare/.soft_ver /koolshare/ >/dev/null 2>&1
-		cp -rf /rom/etc/koolshare/.soft_ver_old /koolshare/  >/dev/null 2>&1
-		# 写入版本号dbus值
-		/usr/bin/dbus set softcenter_version=$(cat /koolshare/.soft_ver)
-
-		echo "ℹ️  恢复软件中心二进制"
-		# 恢复二进制 改成创建软连接节省空间
-		local _BINS=$(find /rom/etc/koolshare/bin/* | awk -F "/" '{print $NF}' | sed '/^$/d')
-		for _BIN in ${_BINS}
-		do
-			if [ -f "/rom/etc/koolshare/bin/${_BIN}" ];then
-				# 安装二进制软连接
-				rm -rf /koolshare/bin/${_BIN}
-				ln -sf /rom/etc/koolshare/bin/${_BIN} /koolshare/bin/${_BIN}
-			fi
-		done
-		sync
-
-		echo "ℹ️  恢复软件中心资源"
-		cp -rf /rom/etc/koolshare/res/* /koolshare/res/  >/dev/null 2>&1
-		cp -rf /rom/etc/koolshare/webs/* /koolshare/webs/  >/dev/null 2>&1
-
-		echo "ℹ️  恢复软件中心脚本"
-		cp -rf /rom/etc/koolshare/scripts/* /koolshare/scripts/  >/dev/null 2>&1
-		cp -rf /rom/etc/koolshare/perp/* /koolshare/perp/  >/dev/null 2>&1
-
-		# 文件赋权
-		chmod +x /koolshare/scripts/*  >/dev/null 2>&1
-		chmod +x /koolshare/perp/perp.sh  >/dev/null 2>&1
-		# 重启软件中心
-		if [ -f /koolshare/perp/perp.sh ];then
-			echo "ℹ️  重启软件中心"
-			sh /koolshare/perp/perp.sh >/dev/null 2>&1
-		fi
+    doRecovery
 	else
-		echo "ℹ️  软件中心无需恢复"
+	  local md5sum1=$(md5sum /rom/etc/koolshare/scripts/ks_app_install.sh | awk '{print $1}')
+	  local md5sum2=$(md5sum /koolshare/scripts/ks_app_install.sh | awk '{print $1}')
+	  local md5sum3=$(md5sum /rom/etc/koolshare/scripts/ks_tar_install.sh | awk '{print $1}')
+	  local md5sum4=$(md5sum /koolshare/scripts/ks_tar_install.sh | awk '{print $1}')
+	  echo "ℹ️  固件自带文件: $md5sum1 | $md5sum3"
+	  echo "ℹ️  软件中心文件: $md5sum2 | $md5sum4"
+	  if [ "$md5sum1" != "$md5sum2" ] || [ "$md5sum3" != "$md5sum4" ];then
+	    echo "ℹ️  脚本不一致，开始恢复"
+      doRecovery
+    else
+		  echo "ℹ️  软件中心无需恢复"
+		fi
 	fi
 
 	echo "✅️ Step 2 Done!"
